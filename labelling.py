@@ -40,15 +40,22 @@ class Scroller(AnnotationTool):
 
 
 class Highlighter(AnnotationTool):
+
     def __init__(self, displayer: Displayer, button: int):
         super().__init__(displayer, button)
         self.connect('button_press_event', 'on_press')
-        self.color = 'green'
-        self.n = 0
     
     def on_press(self, event):
         if self.check_button(event):
-            self.displayer.plot_pulse(event.xdata, color=self.color[self.n])
+            pos = event.xdata      
+            disp = self.displayer  
+            cut = len(disp.monit.onsets[disp.monit.onsets < pos])
+            start, stop = disp.monit.onsets[cut - 1], disp.monit.onsets[cut]
+            new_cat = (disp.monit.category[start] + 1) % 3
+            disp.monit.category[start] = new_cat
+            color = disp.corresp[new_cat]
+            self.displayer.plot_layer(start, stop, color=color)
+
 
 class PeakMover(AnnotationTool):
     def __init__(self, displayer: Displayer, button: int):
@@ -61,7 +68,6 @@ class PeakMover(AnnotationTool):
         if self.check_button(event):
             scores = np.abs(self.displayer.monit.p1p2 - event.xdata)
             self.index_to_modify = np.argmin(scores)
-            print("press")
 
     def on_release(self, event):
         if self.check_button(event):
@@ -70,4 +76,3 @@ class PeakMover(AnnotationTool):
             self.displayer.monit.p1p2[self.index_to_modify] = new_value
             lim_a, lim_b = map(int, self.displayer.ax.get_xlim())
             self.displayer.plot(lim_a, lim_b)
-            print("release")
