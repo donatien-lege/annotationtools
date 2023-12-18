@@ -5,16 +5,16 @@ class Displayer():
     corresp = {0: "black", 1: "purple", 2: "red"}
 
     def __init__(self, monit: Monitoring, fig, ax):
-        self.monit = monit
         self.fig = fig
         self.ax = ax
-
+        self.monit = monit
+        
     def plot(self, lim_a, lim_b):
         self.ax.cla()
         self.ax.plot(self.monit.df[lim_a: lim_b], color='black')
         self.ax.set_xlim(lim_a, lim_b)
         self.plot_sep(lim_a, lim_b)
-        self.plot_p1p2(lim_a, lim_b)
+        self.plot_peaks(lim_a, lim_b)
         self.update_colors(lim_a, lim_b)
         self.fig.canvas.draw()
 
@@ -29,11 +29,11 @@ class Displayer():
                 self.plot_layer(onsets[s], onsets[e], color=color)
 
     def plot_sep(self, lim_a, lim_b):
-        in_window = (self.monit.p1p2 > lim_a) & (self.monit.p1p2 < lim_b)
-        for peak in self.monit.p1p2[in_window]:
+        in_window = (self.monit.peaks > lim_a) & (self.monit.peaks < lim_b)
+        for peak in self.monit.peaks[in_window]:
             self.ax.scatter(peak, self.monit.df.iloc[peak, 0], color='red')
 
-    def plot_p1p2(self, lim_a, lim_b):
+    def plot_peaks(self, lim_a, lim_b):
         in_window = (self.monit.onsets > lim_a) & (self.monit.onsets < lim_b)
         for onset in self.monit.onsets[in_window]:
             self.ax.axvline(onset, color="white")
