@@ -11,18 +11,17 @@ class Monitoring():
 
     def __init__(
         self, 
-        data: Iterable,
-        previous_annots=None,
+        data: Iterable = None,
         fs=100, 
         p1p2=True,
+        previous: dict=None
     ):
-        
-        if previous_annots is not None:
-            self.df = previous_annots["signal"]
-            self.peaks = previous_annots["peaks"]
-            self.onsets = previous_annots["onsets"]
-            self.category = previous_annots["category"]
-            self.candidates = previous_annots["candidates"]
+        if previous is not None:
+            self.df = previous["signal"]
+            self.peaks = previous["peaks"]
+            self.onsets = previous["onsets"]
+            self.category = previous["category"]
+            self.candidates = previous["candidates"]
         else:
             self.df = pd.DataFrame(butter_lowpass_filter(data))
             self.onsets = modified_scholkmann(self.df.values, fs=fs)
