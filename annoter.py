@@ -40,16 +40,19 @@ class Annoter():
         self.fig.canvas.draw()
 
     def set_handlers(self, signals: Iterable):
-        self.fig, self.axes = plt.subplots(len(signals), 1)
-        if len(signals) == 1:
-            self.axes = (self.axes,)
+        self.fig, self.axes = plt.subplots(len(signals), squeeze=False)
+        self.axes = self.axes.reshape(1)
         params = zip(map(Monitoring, signals), self.axes)
         self.axhandlers = [AxHandler(m, self.fig, ax) for m, ax in params]
         self.fig.canvas.mpl_connect("key_press_event", self.msg_save)
 
     def load(self, folder: str):
+        self.folder = folder
         subnames = glob.glob(f"{folder}/*")
-        self.fig, self.axes = plt.subplots(len(subnames))
+        if len(subnames) == 0:
+            raise FileNotFoundError
+        self.fig, self.axes = plt.subplots(len(subnames), squeeze=False)
+        self.axes = self.axes.reshape(1)
         handlers = []
         for sub in subnames:
             onsets = pd.read_csv(f"{sub}/onsets.csv").values.squeeze()
@@ -73,6 +76,7 @@ class Annoter():
         self.save()
 
     def save(self):
+        print(self.folder)
         try:
             os.mkdir(self.folder)
         except FileExistsError:

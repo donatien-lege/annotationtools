@@ -1,6 +1,7 @@
 from displayer import Displayer
 import inspect
 import numpy as np
+from matplotlib.widgets import Slider
 
 class AnnotationTool():
     def __init__(self, displayer: Displayer, button=None):
